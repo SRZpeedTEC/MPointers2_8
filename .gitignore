@@ -1,0 +1,18 @@
+# Ignora carpetas de build
+build/
+cmake-build-*
+CMakeFiles/
+Makefile
+*.cmake
+
+# Ignora archivos generados por Protobuf
+*.pb.cc
+*.pb.h
+*.grpc.pb.cc
+*.grpc.pb.h
+
+# Ignora ejecutables
+*.exe
+*.dll
+*.so
+*.out

@@ -1,4 +1,4 @@
-syntax = "proto3";
+ syntax = "proto3";
 
 // Definimos un paquete opcional
 package greet;

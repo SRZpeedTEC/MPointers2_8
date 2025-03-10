@@ -23,7 +23,9 @@ file(MAKE_DIRECTORY ${GENERATED_DIR})
 # 4) Rutas a protoc y plugin gRPC
 set(_PROTOBUF_PROTOC         ${Protobuf_PROTOC_EXECUTABLE})
 # Suponiendo que vcpkg está en C:/dev/vcpkg
-set(_GRPC_CPP_PLUGIN "E:/ClionProjects/vcpkg/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe")
+#set(_GRPC_CPP_PLUGIN "E:/ClionProjects/vcpkg/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe")
+
+set(_GRPC_CPP_PLUGIN "/Users/santirobles/vcpkg/installed/arm64-osx/tools/grpc/grpc_cpp_plugin")
 
 set(_GRPC_CPP_PLUGIN_OPTIONS "--plugin=protoc-gen-grpc=${_GRPC_CPP_PLUGIN}")
 

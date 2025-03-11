@@ -1,77 +1,72 @@
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.10)
 project(MPointers2_8)
 
 set(CMAKE_CXX_STANDARD 20)
 
-
-# (Opcional) si usas vcpkg y no está integrado globalmente, fuerza el toolchain:
-# set(CMAKE_TOOLCHAIN_FILE "C:/ruta/a/vcpkg/scripts/buildsystems/vcpkg.cmake")
-
-# 1) Buscar Protobuf y gRPC (versión "CONFIG" o la que uses con vcpkg):
 find_package(Protobuf REQUIRED)
 find_package(gRPC REQUIRED)
+
+message(STATUS "Protobuf version: ${Protobuf_VERSION}")
 message(STATUS "gRPC plugin: ${gRPC_CPP_PLUGIN}")
 
+# 1) Archivo .proto
+set(PROTO_FILE "${CMAKE_SOURCE_DIR}/proto/memory.proto")
 
-# 2) Archivo .proto que queremos compilar:
-set(PROTO_FILE ${CMAKE_SOURCE_DIR}/proto/memory.proto)
-
-# 3) Directorio donde se generarán los .pb/.grpc.*.cc/h
-set(GENERATED_DIR ${CMAKE_SOURCE_DIR}/proto)
+# 2) Directorio donde se generan .pb.* y .grpc.pb.*
+#    Se recomienda usar una carpeta dentro de la build (ej. CMAKE_CURRENT_BINARY_DIR),
+#    pero si prefieres, puedes dejarlos en ${CMAKE_SOURCE_DIR}/proto.
+set(GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
 file(MAKE_DIRECTORY ${GENERATED_DIR})
 
-# 4) Rutas a protoc y plugin gRPC
-set(_PROTOBUF_PROTOC         ${Protobuf_PROTOC_EXECUTABLE})
-# Suponiendo que vcpkg está en C:/dev/vcpkg
-#set(_GRPC_CPP_PLUGIN "E:/ClionProjects/vcpkg/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe")
+# 3) Definir nombres de los archivos de salida
+get_filename_component(PROTO_BASENAME ${PROTO_FILE} NAME_WE)
+set(PB_SRC   "${GENERATED_DIR}/${PROTO_BASENAME}.pb.cc")
+set(PB_HDR   "${GENERATED_DIR}/${PROTO_BASENAME}.pb.h")
+set(GRPC_SRC "${GENERATED_DIR}/${PROTO_BASENAME}.grpc.pb.cc"
+        src/memory_manager_server.h)
+set(GRPC_HDR "${GENERATED_DIR}/${PROTO_BASENAME}.grpc.pb.h")
 
-set(_GRPC_CPP_PLUGIN "E:/ClionProjects/vcpkg/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe") #"E:/ClionProjects/vcpkg/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe" //  "/Users/santirobles/vcpkg/installed/arm64-osx/tools/grpc/grpc_cpp_plugin"
-
-set(_GRPC_CPP_PLUGIN_OPTIONS "--plugin=protoc-gen-grpc=${_GRPC_CPP_PLUGIN}")
-
-# 5) Definimos archivos de salida
-get_filename_component(proto_name ${PROTO_FILE} NAME_WE)
-set(pb_src   "${GENERATED_DIR}/${proto_name}.pb.cc")
-set(pb_hdr   "${GENERATED_DIR}/${proto_name}.pb.h")
-set(grpc_src "${GENERATED_DIR}/${proto_name}.grpc.pb.cc")
-set(grpc_hdr "${GENERATED_DIR}/${proto_name}.grpc.pb.h")
-
-# 6) Comando para invocar protoc y generar .pb.cc/.pb.h y .grpc.pb.cc/.grpc.pb.h
+# 4) Comando para invocar protoc
 add_custom_command(
-        OUTPUT "${pb_src}" "${pb_hdr}" "${grpc_src}" "${grpc_hdr}"
-        COMMAND ${_PROTOBUF_PROTOC}
-        ARGS --proto_path=${CMAKE_SOURCE_DIR}/proto
+        OUTPUT "${PB_SRC}" "${PB_HDR}" "${GRPC_SRC}" "${GRPC_HDR}"
+        COMMAND ${Protobuf_PROTOC_EXECUTABLE}
+        ARGS
+        --proto_path=${CMAKE_SOURCE_DIR}/proto
         --cpp_out=${GENERATED_DIR}
         --grpc_out=${GENERATED_DIR}
-        ${_GRPC_CPP_PLUGIN_OPTIONS}
-        ${PROTO_FILE}
-        DEPENDS ${PROTO_FILE}
-        COMMENT "Generating Protobuf & gRPC files from ${PROTO_FILE}"
-        VERBATIM
+        --plugin=protoc-gen-grpc="E:/ClionProjects/vcpkg/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe" # "/Users/santirobles/vcpkg/installed/arm64-osx/tools/grpc/grpc_cpp_plugin"
+        memory.proto
 )
 
-
-
-# 7) Creamos una librería con los archivos generados
+# 5) Crear la librería con los archivos generados
 add_library(memory_proto
-        ${pb_src}
-        ${grpc_src}
+        "${PB_SRC}"
+        "${GRPC_SRC}"
 )
-# Asegúrate de incluir la carpeta generada, para encontrar los .h
-target_include_directories(memory_proto PUBLIC ${GENERATED_DIR})
+
+# Incluir la carpeta de archivos generados (para encontrar .pb.h y .grpc.pb.h)
+target_include_directories(memory_proto
+        PUBLIC
+        "${GENERATED_DIR}"
+)
+
+# Vincular con las librerías de gRPC y Protobuf
 target_link_libraries(memory_proto
         PUBLIC
         gRPC::grpc++
         protobuf::libprotobuf
 )
 
-# 8) Ejecutable del servidor
-add_executable(server src/memory_manager.cpp)
-target_include_directories(server PRIVATE ${CMAKE_SOURCE_DIR}/include)
+# 6) Ejecutable del servidor (ejemplo)
+add_executable(server
+        src/memory_manager_server.cpp
+        # Puedes añadir más .cpp de tu servidor
+)
 target_link_libraries(server PRIVATE memory_proto)
 
-# 9) Ejecutable del cliente
-add_executable(client src/mpointer.cpp)
-target_include_directories(client PRIVATE ${CMAKE_SOURCE_DIR}/include)
+# 7) Ejecutable del cliente (ejemplo)
+add_executable(client
+        src/mpointer.cpp
+        # Más .cpp si deseas
+)
 target_link_libraries(client PRIVATE memory_proto)
-

@@ -23,9 +23,10 @@ file(MAKE_DIRECTORY ${GENERATED_DIR})
 # 4) Rutas a protoc y plugin gRPC
 set(_PROTOBUF_PROTOC         ${Protobuf_PROTOC_EXECUTABLE})
 # Suponiendo que vcpkg está en C:/dev/vcpkg
-#set(_GRPC_CPP_PLUGIN "E:/ClionProjects/vcpkg/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe")
+set(_GRPC_CPP_PLUGIN "/Users/santirobles/vcpkg/installed/arm64-osx/tools/grpc/grpc_cpp_plugin")
 
-set(_GRPC_CPP_PLUGIN "E:/ClionProjects/vcpkg/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe") #"E:/ClionProjects/vcpkg/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe" //  "/Users/santirobles/vcpkg/installed/arm64-osx/tools/grpc/grpc_cpp_plugin"
+#set(_GRPC_CPP_PLUGIN "E:/ClionProjects/vcpkg/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe") #"E:/ClionProjects/vcpkg/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe" //
+
 
 set(_GRPC_CPP_PLUGIN_OPTIONS "--plugin=protoc-gen-grpc=${_GRPC_CPP_PLUGIN}")
 
@@ -71,7 +72,14 @@ target_include_directories(server PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(server PRIVATE memory_proto)
 
 # 9) Ejecutable del cliente
-add_executable(client src/mpointer.cpp)
+add_executable(client src/client.cpp)
 target_include_directories(client PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(client PRIVATE memory_proto)
 
+
+# Crear la biblioteca del Mock Memory Manager
+add_library(mock_memory_manager src/mock_memory_manager.cpp)
+
+# Agregar el ejecutable para pruebas
+add_executable(test_mpointers test/test_mpointers.cpp)
+target_link_libraries(test_mpointers mock_memory_manager)

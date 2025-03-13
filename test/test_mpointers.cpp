@@ -28,6 +28,7 @@ int main() {
 
     // ver que efectivamente apuntan al mismo lado
     std::cout << "Valor de p3 (debe ser el mismo que p1): " << *p3 << std::endl;
+    std::cout << "Valor de p1  " << *p1 << std::endl;
 
     // destruir los punteros ** todavia tengo que ver si funciona bien
     {

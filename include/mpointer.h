@@ -10,6 +10,7 @@ private:
     static MockMemoryManager* manager;
 
     //Esta clase Proxy la hizo chat, tengo que ver bien que es lo que hace xd
+    MPointer<T>& operator=(const T&) = delete;
 
     class Proxy {
     private:

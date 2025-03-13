@@ -9,6 +9,8 @@ private:
     int id;
     static MockMemoryManager* manager;
 
+    //Esta clase Proxy la hizo chat, tengo que ver bien que es lo que hace xd
+
     class Proxy {
     private:
         MPointer<T>* owner;  // Referencia al MPointer para acceder a id y manager
@@ -74,7 +76,7 @@ void MPointer<T>::operator=(T value) {
 template <typename T>
 void MPointer<T>::operator=(MPointer<T>& other) {
     this->id = other.id;
-    manager->IncreaseRefCount(id);  // Incrementa la referencia en el Memory Manager
+    manager->IncreaseRefCount(id);
 }
 
 template <typename T>

@@ -56,7 +56,8 @@ bool mpointerClient::HandleSetRequest(int id, string binValue)
         std::cerr << "Set falló lógicamente: " << sres.errormsg() << std::endl;
         return 1;
     }
-    std::cout << "[CLIENT] Set exitoso en bloque " << id() << std::endl;
+    std::cout << "[CLIENT] Set exitoso en bloque " << id << std::endl;
+    return 0;
 }
 
 
@@ -73,13 +74,12 @@ string mpointerClient::HandleGetRequest(int id)
                   << " msg=" << stGet.error_message() << std::endl;
         return "error";
     }
-    // Extraer 4 bytes
-    if (gres.value().size() == 4) {
+    else {
         std::string data = gres.value();
-        std::cout << "[CLIENT] Valor leído: " << data << std::endl;
-    } else {
-        std::cerr << "[CLIENT] Error: tamaño de datos != 4" << std::endl;
+        //std::cout << "[CLIENT] Valor leído: " << data << std::endl;
+        return data;
     }
+
 
 }
 
@@ -101,7 +101,8 @@ bool mpointerClient::HandleIncreaseRefCountRequest(int id)
         std::cerr << "Increase Ref Count falló lógicamente: " << Ires.errormsg() << std::endl;
         return 1;
     }
-    std::cout << "[CLIENT] Increase Ref Count exitoso en bloque " << id() << std::endl;
+    std::cout << "[CLIENT] Increase Ref Count exitoso en bloque " << id << std::endl;
+    return 0;
 
 
 }
@@ -115,15 +116,16 @@ bool mpointerClient::HandleDecreaseRefCountRequest(int id)
     grpc::ClientContext Dctx;
     grpc::Status stDeRefCt = stub->DecreaseRefCount(&Dctx, request, &Dres);
     if (!stDeRefCt.ok()) {
-        std::cerr << "Increase Ref Count falló (RPC error). Code=" << stDeRefCt.error_code()
+        std::cerr << "Decrease Ref Count falló (RPC error). Code=" << stDeRefCt.error_code()
                   << " msg=" << stDeRefCt.error_message() << std::endl;
         return 1;
     }
     if (!Dres.success()) {
-        std::cerr << "Increase Ref Count falló lógicamente: " << Dres.errormsg() << std::endl;
+        std::cerr << "Decrease Ref Count falló lógicamente: " << Dres.errormsg() << std::endl;
         return 1;
     }
-    std::cout << "[CLIENT] Increase Ref Count exitoso en bloque " << id() << std::endl;
+    std::cout << "[CLIENT] Decrease Ref Count exitoso en bloque " << id << std::endl;
+    return 0;
 
 
 

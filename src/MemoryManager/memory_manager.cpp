@@ -152,6 +152,7 @@ grpc::Status memory_manager::IncreaseRefCount(grpc::ServerContext* context,
     memoryBlockInfo& blockInfo = blockToFind->second;
     blockInfo.refcount++;
 
+    response->set_success(true);
     dumpFolderClass.dumpFolderUpdate(memoryBlocks);
 
     return grpc::Status::OK;
@@ -173,6 +174,7 @@ grpc::Status memory_manager::DecreaseRefCount(grpc::ServerContext* context,
     memoryBlockInfo& blockInfo = blockToFind->second;
     blockInfo.refcount--;
 
+    response->set_success(true);
     dumpFolderClass.dumpFolderUpdate(memoryBlocks);
 
     return grpc::Status::OK;

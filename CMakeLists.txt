@@ -37,8 +37,8 @@ add_custom_command(
         --proto_path=${CMAKE_SOURCE_DIR}/proto
         --cpp_out=${GENERATED_DIR}
         --grpc_out=${GENERATED_DIR}
-        --plugin=protoc-gen-grpc="/Users/santirobles/vcpkg/installed/arm64-osx/tools/grpc/grpc_cpp_plugin"
-        #--plugin=protoc-gen-grpc="E:/ClionProjects/vcpkg/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe"
+        #--plugin=protoc-gen-grpc="/Users/santirobles/vcpkg/installed/arm64-osx/tools/grpc/grpc_cpp_plugin"
+        --plugin=protoc-gen-grpc="E:/ClionProjects/vcpkg/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe"
         memory.proto
 )
 

@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iostream>
 #include<map>
+#include <filesystem>
 
 using namespace std::chrono;
 
@@ -23,6 +24,7 @@ dumpFolderFunction::~dumpFolderFunction()
 
 void dumpFolderFunction::dumpFolderUpdate(map<int, memoryBlockInfo>& memoryBlocksMap)
 {
+    filesystem::create_directories(folderPath);
     auto now = system_clock::now();
     auto ms = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
     time_t t = system_clock::to_time_t(now);
@@ -35,7 +37,7 @@ void dumpFolderFunction::dumpFolderUpdate(map<int, memoryBlockInfo>& memoryBlock
 #endif
 
     char timeBuf[64];
-    strftime(timeBuf, sizeof(timeBuf), "%H:%M:%S", &tmLocal);
+    strftime(timeBuf, sizeof(timeBuf), "%H-%M-%S", &tmLocal);
 
     ostringstream filename;
     filename << folderPath << "/dump_"
@@ -50,20 +52,28 @@ void dumpFolderFunction::dumpFolderUpdate(map<int, memoryBlockInfo>& memoryBlock
         return;
     }
 
-    out << "ID\tSize\tType\tRefCount\tstart_ptr\n";
+    out << left
+    << setw(4)  << "ID"
+    << setw(8)  << "Size"
+    << setw(90) << "Type"
+    << setw(30)  << "RefCount"
+    << setw(30) << "start_ptr"
+    << endl;
 
-    for (auto &Block : memoryBlocksMap)
-    {
+    // Luego cada fila
+    for (auto &Block : memoryBlocksMap) {
         int blockID = Block.first;
         const memoryBlockInfo &blockInfo = Block.second;
+        void* ptrVal = blockInfo.start_ptr;
 
-        void* ptrVal = static_cast<void*>(blockInfo.start_ptr);
-
-        out << blockID << "\t"
-            << blockInfo.size << "\t"
-            << blockInfo.type << "\t"
-            << blockInfo.refcount << "\t"
-            << ptrVal << "\n";
+        // Imprimir fila con la misma alineación y anchuras
+        out << left
+            << setw(4)  << blockID
+            << setw(8)  << blockInfo.size
+            << setw(90) << blockInfo.type
+            << setw(30)  << blockInfo.refcount
+            << setw(30) << ptrVal
+            << endl;
     }
     out.close();
 

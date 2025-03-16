@@ -26,6 +26,7 @@ message SetRequest{
 
 message SetResponse{
   bool success = 1;
+  string errorMsg = 2; // Mensaje por si llega a dar error
 }
 
  message GetRequest{
@@ -34,6 +35,8 @@ message SetResponse{
 
  message GetResponse{
    bytes value = 1;
+   bool success = 2;
+   string errorMsg = 3; // Mensaje por si llega a dar error
  }
 
  message IncreaseRefCountRequest{
@@ -46,9 +49,11 @@ message SetResponse{
 
  message DecreaseRefCountRequest{
    uint64 id = 1;
+   string errorMsg = 2; // Mensaje por si llega a dar error
  }
 
  message DecreaseRefCountResponse{
    bool success = 1;
+   string errorMsg = 2; // Mensaje por si llega a dar error
  }
 

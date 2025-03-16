@@ -40,6 +40,7 @@ int main(int argc, char** argv) {
             return 1;
         }
     }
+
     size_t totalBytes = memsize * 1024 * 1024;
     void* memoryBlock = malloc(totalBytes);
     if (!memoryBlock)
@@ -48,7 +49,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    memory_manager service(memoryBlock, totalBytes, dumpfolder);
+    memory_manager service(memoryBlock, totalBytes, &dumpfolder);
 
     string server_address("0.0.0.0:" + port);
     grpc::ServerBuilder builder;
@@ -56,6 +57,7 @@ int main(int argc, char** argv) {
     builder.RegisterService(&service);
 
     unique_ptr<Server> server(builder.BuildAndStart());
+    cout << "Memory Manager escuchando en " << server_address << std::endl;
 
     cout << "Configuración final:" << endl;
     cout << " - Puerto: " << port << endl;
@@ -63,6 +65,7 @@ int main(int argc, char** argv) {
     cout << " - Carpeta de dumps: " << dumpfolder << endl;
     cout << "Servidor iniciado en " << server_address << endl;
 
+    server->Wait();
 
     free(memoryBlock);
     return 0;

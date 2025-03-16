@@ -22,8 +22,7 @@ file(MAKE_DIRECTORY ${GENERATED_DIR})
 get_filename_component(PROTO_BASENAME ${PROTO_FILE} NAME_WE)
 set(PB_SRC   "${GENERATED_DIR}/${PROTO_BASENAME}.pb.cc")
 set(PB_HDR   "${GENERATED_DIR}/${PROTO_BASENAME}.pb.h")
-set(GRPC_SRC "${GENERATED_DIR}/${PROTO_BASENAME}.grpc.pb.cc"
-        src/memory_manager_server.h)
+set(GRPC_SRC "${GENERATED_DIR}/${PROTO_BASENAME}.grpc.pb.cc")
 set(GRPC_HDR "${GENERATED_DIR}/${PROTO_BASENAME}.grpc.pb.h")
 
 # 4) Comando para invocar protoc
@@ -60,13 +59,14 @@ target_link_libraries(memory_proto
 # 6) Ejecutable del servidor (ejemplo)
 add_executable(server
         src/memory_manager_server.cpp
+        src/MemoryManager/memory_manager.cpp
         # Puedes añadir más .cpp de tu servidor
 )
 target_link_libraries(server PRIVATE memory_proto)
 
 # 7) Ejecutable del cliente (ejemplo)
 add_executable(client
-        src/mpointer.cpp
+        src/mpointerClient.cpp
         # Más .cpp si deseas
 )
 target_link_libraries(client PRIVATE memory_proto)

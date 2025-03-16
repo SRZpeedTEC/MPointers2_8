@@ -6,6 +6,8 @@ int main() {
 
     // Aquí se inicializa la biblioteca de MPointers
     MPointer<int>::Init();
+    std::cout << "Cliente iniciado, conexión establecida " << std::endl;
+
 
     //Crear un mpointer
     MPointer<int> p1 = MPointer<int>::New();
@@ -38,5 +40,10 @@ int main() {
     }  // Aquí `p4` sale del scope y su destructor se ejecuta
 
     std::cout << "\n=== PRUEBAS FINALIZADAS ===\n" << std::endl;
+
+
+
     return 0;
+
+
 }

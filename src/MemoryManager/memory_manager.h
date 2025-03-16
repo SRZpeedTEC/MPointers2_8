@@ -8,15 +8,11 @@
 #include <string>
 #include <chrono>
 #include <fstream>
+#include "../MemoryManagerFeatures/dumpFolderFunction.h"
+#include "../MemoryManager/memoryBlockInfo.h"
+
 using namespace std;
 
-struct memoryBlockInfo  // Creacion de una estructura para representar los bloques de memoria
-{
-    void* start_ptr;
-    size_t size;
-    string type;
-    int refcount;
-};
 
 class memory_manager : public memmgr::MemoryManager::Service{       // Constructor de la clase memory manager, hereda del servicio gRPC para usar las comunicaciones
 
@@ -49,13 +45,13 @@ public:
     void* memoryBlock;  // Variable para el bloque de memoria principal
     size_t totalBytes;  // Espacio total del bloque
     string* dumpFolder;  // Path al dumpfolder
+    dumpFolderFunction dumpFolderClass;
 
     map<int, memoryBlockInfo> memoryBlocks; // Estructura para manejar la asignacion de bloques
     int nextId = 1;
 
     mutex mtx;    // Sincronizacion con el servidor
 
-    void DumpMemory(const string& filename);
     void GarbageCollectorLoop();
 };
 

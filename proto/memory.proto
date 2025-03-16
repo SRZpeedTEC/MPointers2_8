@@ -45,11 +45,12 @@ message SetResponse{
 
  message IncreaseRefCountResponse{
    bool success = 1;
+   string errorMsg = 2; // Mensaje por si llega a dar error
  }
 
  message DecreaseRefCountRequest{
    uint64 id = 1;
-   string errorMsg = 2; // Mensaje por si llega a dar error
+
  }
 
  message DecreaseRefCountResponse{

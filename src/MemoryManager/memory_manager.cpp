@@ -1,7 +1,6 @@
 
 #include "memory_manager.h"
 #pragma once
-
 #include <grpcpp/grpcpp.h>
 #include "memory.grpc.pb.h"
 #include <mutex>
@@ -9,11 +8,13 @@
 #include <string>
 #include <chrono>
 #include <fstream>
+#include "../MemoryManagerFeatures/dumpFolderFunction.h"
+
 using namespace std;
 
 
 memory_manager::memory_manager(void* memory, size_t totalSize, string* dumpFolder)
-    : memoryBlock(memory), totalBytes(totalSize), dumpFolder(dumpFolder)
+    : memoryBlock(memory), totalBytes(totalSize), dumpFolder(dumpFolder), dumpFolderClass(*dumpFolder)
 {
 
 }
@@ -31,6 +32,7 @@ grpc::Status memory_manager::Create(grpc::ServerContext* context,
     uint32_t sizeRequested = request->size(); // tamano reservado para el bloque
     const string& typeRequested = request->type();
 
+    // Agregar situacion para bloques vacios entre espacios usados
 
     size_t usedBytes = 0;
     for (auto& block : memoryBlocks)
@@ -66,7 +68,7 @@ grpc::Status memory_manager::Create(grpc::ServerContext* context,
     << " rangobytes=[" << usedBytes << "," << usedBytes + newBlockInfo.size << ")"
     << " type=" << typeRequested << " refcount=1" << endl;
 
-    // DumpMemory("Create"); (Implementar)
+    dumpFolderClass.dumpFolderUpdate(memoryBlocks);
 
     return grpc::Status::OK;
 
@@ -102,6 +104,8 @@ grpc::Status memory_manager::Set(grpc::ServerContext* context,
     response->set_success(true);
     cout << "[Set] Bloque " << id << " escrito. Bytes=" << valueBytes.size() << endl;
 
+    dumpFolderClass.dumpFolderUpdate(memoryBlocks);
+
     return grpc::Status::OK;
 
 }
@@ -126,6 +130,9 @@ grpc::Status memory_manager::Get(grpc::ServerContext* context,
     string result(strPtr, strPtr + blockInfo.size);
 
     response->set_value(result);
+
+    dumpFolderClass.dumpFolderUpdate(memoryBlocks);
+
     return grpc::Status::OK;
 
 }
@@ -133,11 +140,42 @@ grpc::Status memory_manager::Get(grpc::ServerContext* context,
 grpc::Status memory_manager::IncreaseRefCount(grpc::ServerContext* context,
                                               const memmgr::IncreaseRefCountRequest* request,
                                               memmgr::IncreaseRefCountResponse* response) {
+
+    uint64_t id = request->id();
+    auto blockToFind = memoryBlocks.find(static_cast<int>(id));
+    if (blockToFind == memoryBlocks.end())
+    {
+        response->set_success(false);
+        response->set_errormsg("No se ha encontrado un bloque con la id solicitada");
+    }
+
+    memoryBlockInfo& blockInfo = blockToFind->second;
+    blockInfo.refcount++;
+
+    dumpFolderClass.dumpFolderUpdate(memoryBlocks);
+
     return grpc::Status::OK;
+
 }
 
 grpc::Status memory_manager::DecreaseRefCount(grpc::ServerContext* context,
                                               const memmgr::DecreaseRefCountRequest* request,
                                               memmgr::DecreaseRefCountResponse* response) {
+
+    uint64_t id = request->id();
+    auto blockToFind = memoryBlocks.find(static_cast<int>(id));
+    if (blockToFind == memoryBlocks.end())
+    {
+        response->set_success(false);
+        response->set_errormsg("No se ha encontrado un bloque con la id solicitada");
+    }
+
+    memoryBlockInfo& blockInfo = blockToFind->second;
+    blockInfo.refcount--;
+
+    dumpFolderClass.dumpFolderUpdate(memoryBlocks);
+
     return grpc::Status::OK;
 }
+
+

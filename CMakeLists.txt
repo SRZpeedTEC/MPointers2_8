@@ -22,7 +22,11 @@ file(MAKE_DIRECTORY ${GENERATED_DIR})
 get_filename_component(PROTO_BASENAME ${PROTO_FILE} NAME_WE)
 set(PB_SRC   "${GENERATED_DIR}/${PROTO_BASENAME}.pb.cc")
 set(PB_HDR   "${GENERATED_DIR}/${PROTO_BASENAME}.pb.h")
-set(GRPC_SRC "${GENERATED_DIR}/${PROTO_BASENAME}.grpc.pb.cc")
+set(GRPC_SRC "${GENERATED_DIR}/${PROTO_BASENAME}.grpc.pb.cc"
+        include/mpointerClient.h
+        src/MemoryManagerFeatures/dumpFolderFunction.cpp
+        src/MemoryManagerFeatures/dumpFolderFunction.h
+        src/MemoryManager/memoryBlockInfo.h)
 set(GRPC_HDR "${GENERATED_DIR}/${PROTO_BASENAME}.grpc.pb.h")
 
 # 4) Comando para invocar protoc
@@ -33,8 +37,8 @@ add_custom_command(
         --proto_path=${CMAKE_SOURCE_DIR}/proto
         --cpp_out=${GENERATED_DIR}
         --grpc_out=${GENERATED_DIR}
-        --plugin=protoc-gen-grpc="/Users/santirobles/vcpkg/installed/arm64-osx/tools/grpc/grpc_cpp_plugin"
-        #--plugin=protoc-gen-grpc="E:/ClionProjects/vcpkg/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe"
+        #--plugin=protoc-gen-grpc="/Users/santirobles/vcpkg/installed/arm64-osx/tools/grpc/grpc_cpp_plugin"
+        --plugin=protoc-gen-grpc="E:/ClionProjects/vcpkg/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe"
         memory.proto
 )
 
@@ -67,6 +71,7 @@ target_link_libraries(server PRIVATE memory_proto)
 
 # 7) Ejecutable del cliente (ejemplo)
 add_executable(client
+        test/test_mpointers.cpp
         src/mpointerClient.cpp
         # Más .cpp si deseas
 )

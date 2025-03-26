@@ -10,7 +10,7 @@
 using namespace std;
 using namespace std::chrono;
 
-garbageCollector::garbageCollector(mutex& blocksMtx, void* memoryStrt) : blocksMutex(blocksMtx), memoryStart(memoryStrt)
+garbageCollector::garbageCollector(mutex& blocksMtx, void* memoryStrt, map<int, memoryBlockInfo>& mapmemoryBlocks) : blocksMutex(blocksMtx), memoryStart(memoryStrt), memoryBlocks(mapmemoryBlocks)
 
 {
 
@@ -31,7 +31,9 @@ size_t garbageCollector::offSetCalculator(memoryBlockInfo& block)
 void garbageCollector::startGarbageCollector()
 {
     garbageCollectorThreadRunning.store(true);
-    garbageCollectorThread = thread(garbageCollectorLoop, this);
+    garbageCollectorThread = thread([this]() {
+    this->garbageCollectorLoop();
+});
 
 }
 void garbageCollector::stopGarbageCollector()
@@ -43,10 +45,12 @@ void garbageCollector::stopGarbageCollector()
     }
 }
 
-void garbageCollector::garbageCollectorLoop(map<int, memoryBlockInfo>& memoryBlocks)
+void garbageCollector::garbageCollectorLoop()
 {
     while (garbageCollectorThreadRunning.load())
     {
+
+        cout << "GARBAGE COLLECTOR THREADFUNCTION" << endl;
         lock_guard<mutex> lock(blocksMutex);
         for (auto it = memoryBlocks.begin(); it != memoryBlocks.end();)
         {
@@ -82,8 +86,8 @@ void garbageCollector::garbageCollectorLoop(map<int, memoryBlockInfo>& memoryBlo
             }
 
         }
-        this_thread::sleep_for(1s);
     }
+    this_thread::sleep_for(15s);
 
 }
 

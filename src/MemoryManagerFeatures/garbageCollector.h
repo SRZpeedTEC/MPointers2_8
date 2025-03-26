@@ -18,7 +18,7 @@ using namespace std;
 class garbageCollector {
 
 public:
-    garbageCollector(mutex& blocksMutex, void* memoryStart);
+    garbageCollector(mutex& blocksMutex, void* memoryStart, map<int, memoryBlockInfo>& memoryBlocks);
     ~garbageCollector();
 
     size_t offSetCalculator(memoryBlockInfo& block);
@@ -27,10 +27,11 @@ public:
 
     void stopGarbageCollector();
 
-    void garbageCollectorLoop(map<int, memoryBlockInfo>& memoryBlocks);
+    void garbageCollectorLoop();
 
     mutex& blocksMutex;
     void* memoryStart;
+    map<int, memoryBlockInfo>& memoryBlocks;
 
 private:
 

@@ -16,9 +16,9 @@ using namespace std;
 
 memory_manager::memory_manager(void* memory, size_t totalSize, string* dumpFolder)
     : memoryBlock(memory), totalBytes(totalSize), dumpFolder(dumpFolder), dumpFolderClass(*dumpFolder),
-    garbageCollectorMemory(mtx, memoryBlock)
+    garbageCollectorMemory(mtx, memoryBlock, memoryBlocks)
 {
-
+    garbageCollectorMemory.startGarbageCollector();
 }
 
 memory_manager::~memory_manager() = default;
@@ -134,7 +134,7 @@ grpc::Status memory_manager::Get(grpc::ServerContext* context,
 
     response->set_value(result);
 
-    dumpFolderClass.dumpFolderUpdate(memoryBlocks);
+    // dumpFolderClass.dumpFolderUpdate(memoryBlocks);
 
     return grpc::Status::OK;
 

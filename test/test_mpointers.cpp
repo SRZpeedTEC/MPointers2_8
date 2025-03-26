@@ -21,6 +21,7 @@ int main() {
     // crear otro mpointer y hacerle un set
     MPointer<string> p2 = MPointer<string>::New();
     *p2 = "Mundo";
+    p2 = "HOLA";
     string str2  = *p2;
     std::cout << "MPointer<int> creado con ID: " << &p2 << std::endl;
     std::cout << "Valor almacenado en p2: " << str2 << std::endl;
@@ -29,6 +30,7 @@ int main() {
     MPointer<string> p3 = MPointer<string>::New();
     p3 = p2;
     string str3 = *p3;
+    std::cout << "p3 ahora apunta al mismo bloque que p2 con ID: " << &p2 << std::endl;
     std::cout << "p3 ahora apunta al mismo bloque que p2 con ID: " << &p3 << std::endl;
 
     // ver que efectivamente apuntan al mismo lado

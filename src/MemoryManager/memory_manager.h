@@ -10,6 +10,7 @@
 #include <fstream>
 #include "../MemoryManagerFeatures/dumpFolderFunction.h"
 #include "../MemoryManager/memoryBlockInfo.h"
+#include "../MemoryManagerFeatures/garbageCollector.h"
 
 using namespace std;
 
@@ -46,6 +47,7 @@ public:
     size_t totalBytes;  // Espacio total del bloque
     string* dumpFolder;  // Path al dumpfolder
     dumpFolderFunction dumpFolderClass;
+    garbageCollector garbageCollectorMemory;
 
     map<int, memoryBlockInfo> memoryBlocks; // Estructura para manejar la asignacion de bloques
     int nextId = 1;

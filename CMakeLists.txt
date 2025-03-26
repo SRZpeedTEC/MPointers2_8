@@ -9,16 +9,15 @@ find_package(gRPC REQUIRED)
 message(STATUS "Protobuf version: ${Protobuf_VERSION}")
 message(STATUS "gRPC plugin: ${gRPC_CPP_PLUGIN}")
 
-# 1) Archivo .proto
+# Archivo .proto
 set(PROTO_FILE "${CMAKE_SOURCE_DIR}/proto/memory.proto")
 
-# 2) Directorio donde se generan .pb.* y .grpc.pb.*
-#    Se recomienda usar una carpeta dentro de la build (ej. CMAKE_CURRENT_BINARY_DIR),
-#    pero si prefieres, puedes dejarlos en ${CMAKE_SOURCE_DIR}/proto.
+# Directorio donde se generan .pb.* y .grpc.pb.*
+
 set(GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
 file(MAKE_DIRECTORY ${GENERATED_DIR})
 
-# 3) Definir nombres de los archivos de salida
+# Definir nombres de los archivos de salida
 get_filename_component(PROTO_BASENAME ${PROTO_FILE} NAME_WE)
 set(PB_SRC   "${GENERATED_DIR}/${PROTO_BASENAME}.pb.cc")
 set(PB_HDR   "${GENERATED_DIR}/${PROTO_BASENAME}.pb.h")
@@ -26,10 +25,13 @@ set(GRPC_SRC "${GENERATED_DIR}/${PROTO_BASENAME}.grpc.pb.cc"
         include/mpointerClient.h
         src/MemoryManagerFeatures/dumpFolderFunction.cpp
         src/MemoryManagerFeatures/dumpFolderFunction.h
-        src/MemoryManager/memoryBlockInfo.h)
+        src/MemoryManager/memoryBlockInfo.h
+        src/MemoryManagerFeatures/garbageCollector.cpp
+        src/MemoryManagerFeatures/garbageCollector.h
+)
 set(GRPC_HDR "${GENERATED_DIR}/${PROTO_BASENAME}.grpc.pb.h")
 
-# 4) Comando para invocar protoc
+# Comando para invocar protoc
 add_custom_command(
         OUTPUT "${PB_SRC}" "${PB_HDR}" "${GRPC_SRC}" "${GRPC_HDR}"
         COMMAND ${Protobuf_PROTOC_EXECUTABLE}
@@ -42,7 +44,7 @@ add_custom_command(
         memory.proto
 )
 
-# 5) Crear la librería con los archivos generados
+# Crear la librería con los archivos generados
 add_library(memory_proto
         "${PB_SRC}"
         "${GRPC_SRC}"
@@ -61,18 +63,18 @@ target_link_libraries(memory_proto
         protobuf::libprotobuf
 )
 
-# 6) Ejecutable del servidor (ejemplo)
+# Ejecutable del servidor
 add_executable(server
         src/memory_manager_server.cpp
         src/MemoryManager/memory_manager.cpp
-        # Puedes añadir más .cpp de tu servidor
+
 )
 target_link_libraries(server PRIVATE memory_proto)
 
-# 7) Ejecutable del cliente (ejemplo)
+#  Ejecutable del cliente
 add_executable(client
         test/test_mpointers.cpp
         src/mpointerClient.cpp
-        # Más .cpp si deseas
+
 )
 target_link_libraries(client PRIVATE memory_proto)

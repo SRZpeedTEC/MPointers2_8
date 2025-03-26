@@ -11,7 +11,7 @@ using namespace std;
 class dumpFolderFunction {
 
 public:
-    dumpFolderFunction(const string& folderPath);
+    explicit dumpFolderFunction(const string& folderPath);
     ~dumpFolderFunction();
 
     void dumpFolderUpdate(map<int, memoryBlockInfo>& memoryBlocks);

@@ -9,12 +9,14 @@
 #include <chrono>
 #include <fstream>
 #include "../MemoryManagerFeatures/dumpFolderFunction.h"
+#include "../MemoryManagerFeatures/garbageCollector.h"
 
 using namespace std;
 
 
 memory_manager::memory_manager(void* memory, size_t totalSize, string* dumpFolder)
-    : memoryBlock(memory), totalBytes(totalSize), dumpFolder(dumpFolder), dumpFolderClass(*dumpFolder)
+    : memoryBlock(memory), totalBytes(totalSize), dumpFolder(dumpFolder), dumpFolderClass(*dumpFolder),
+    garbageCollectorMemory(mtx, memoryBlock)
 {
 
 }
@@ -45,6 +47,7 @@ grpc::Status memory_manager::Create(grpc::ServerContext* context,
             usedBytes = offsetEnd;
         }
     }
+
 
     // Verificar espacio
 

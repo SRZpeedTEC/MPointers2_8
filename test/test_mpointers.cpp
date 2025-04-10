@@ -1,55 +1,101 @@
-#include "../include/mpointer.h"
 #include <iostream>
+#include "../include/mpointer.h"  // <-- Ajusta la ruta según tu proyecto
+
+// ============================================================================
+//                         Estructura Node<T>
+// ============================================================================
+
+template <typename T>
+struct Node {
+    T data;                  // Dato del nodo
+    MPointer<Node<T>> next;  // MPointer al siguiente nodo
+
+    Node() : data(), next() {}
+    Node(const T& val) : data(val), next() {}
+};
+
+// ============================================================================
+//              Clase MList<T>: Lista enlazada con MPointer<Node<T>>
+// ============================================================================
+
+template <typename T>
+class MList {
+private:
+    MPointer<Node<T>> head;  // La cabeza de la lista
+
+public:
+    // Constructor: lista inicialmente vacía
+    MList() : head() {
+        // Si head es "cero" (o un id nulo), significa lista vacía
+    }
+
+    // Inserta un valor al frente de la lista
+    void push_front(const T& value) {
+        // 1. Creamos un nodo remoto
+        MPointer<Node<T>> newNode = MPointer<Node<T>>::New();
+
+        // 2. Preparar un Node<T> local que llenaremos con 'value' y el enlace a 'head'
+
+        Node<T> temp = *newNode;
+        temp.data = value;
+        temp.next = head;
+
+        // 3. Guardamos este Node<T> en el objeto remoto apuntado por newNode
+        *newNode = temp;
+
+        // 4. Actualizamos la cabeza de la lista
+        head = newNode;
+    }
+
+    // Recorre la lista e imprime los valores
+    void printList() const {
+        // Empezamos desde la cabeza
+        MPointer<Node<T>> current = head;
+
+        // Mientras current no sea nulo
+        while (true) {
+            if (current.id == 0) {
+                break;
+            }
+
+            // Obtenemos localmente el contenido del nodo remoto
+            Node<T> nodeData = *current;
+            std::cout << nodeData.data << std::endl;
+
+            // Avanzamos al siguiente
+            current = nodeData.next;
+        }
+    }
+
+    // Comprueba si un MPointer<Node<T>> es nulo
+    // En tu implementación, &mpointer retorna el ID.
+    // Asumimos que un id <= 0 indica que está "vacío" o "nulo".
+    bool isNull(const MPointer<Node<T>>& ptr) const {
+        return (&ptr) <= 0;
+    }
+};
+
+// ============================================================================
+//                               main()
+// ============================================================================
 
 int main() {
-    std::cout << "\n=== INICIANDO PRUEBAS DE MPOINTER<T> ===\n" << std::endl;
+    // 1. Inicializar el sistema de MPointers (si no se hace en otro lado)
+    //    Esto llamará internamente a globalClient->initiateClient(), etc.
+    MPointer<int>::Init();
 
-    // Aquí se inicializa la biblioteca de MPointers
-    MPointer<string>::Init();
-    std::cout << "Cliente iniciado, conexión establecida " << std::endl;
+    // 2. Creamos una lista de enteros
+    MList<int> myList;
 
+    // 3. Insertamos algunos valores al frente
 
-    //Crear un mpointer
-    MPointer<string> p1 = MPointer<string>::New();
-    std::cout << "MPointer<int> creado con ID: " << &p1 << std::endl;
+    myList.push_front(10);
+    myList.push_front(20);
+    myList.push_front(30);
 
-    // hacerle un set al mpointer
-    *p1 = "Hola";
-    string str = *p1;
-    std::cout << "Valor almacenado en p1: " << str << std::endl;
-
-    // crear otro mpointer y hacerle un set
-    MPointer<string> p2 = MPointer<string>::New();
-    *p2 = "Mundo";
-    p2 = "HOLA";
-    string str2  = *p2;
-    std::cout << "MPointer<int> creado con ID: " << &p2 << std::endl;
-    std::cout << "Valor almacenado en p2: " << str2 << std::endl;
-
-    // crear un tercer mpointer y que apunte a lo mismo que apunta p1
-    MPointer<string> p3 = MPointer<string>::New();
-    p3 = p2;
-    string str3 = *p3;
-    std::cout << "p3 ahora apunta al mismo bloque que p2 con ID: " << &p2 << std::endl;
-    std::cout << "p3 ahora apunta al mismo bloque que p2 con ID: " << &p3 << std::endl;
-
-    // ver que efectivamente apuntan al mismo lado
-    std::cout << "Valor de p3 (debe ser el mismo que p2): " << str3 << std::endl;
-    std::cout << "Valor de p2  " << str2 << std::endl;
-
-    // destruir los punteros ** todavia tengo que ver si funciona bien
-    {
-        MPointer<int> p4 = MPointer<int>::New();
-        *p4 = 90;
-        int str4  = *p4;
-        std::cout << "MPointer<int> p4 creado y almacenando: " << str4 << std::endl;
-    }  // Aquí `p4` sale del scope y su destructor se ejecuta
-
-    std::cout << "\n=== PRUEBAS FINALIZADAS ===\n" << std::endl;
-
-
+    // 4. Imprimimos la lista (debería mostrar 30, 20, 10)
+    //std::cout << "Contenido de la lista enlazada (inicio -> fin):" << std::endl;
+    myList.printList();
 
     return 0;
-
-
 }

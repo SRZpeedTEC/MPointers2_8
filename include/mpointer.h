@@ -15,7 +15,7 @@ static mpointerClient* globalClient = nullptr;
 template <typename T>
 class MPointer {
 private:
-    int id;
+
 
     class Proxy {
     private:
@@ -47,6 +47,7 @@ private:
     };
 
 public:
+    int id;
     static void Init();
     static MPointer<T> New();
 
@@ -102,7 +103,9 @@ void MPointer<T>::operator=(T value) {
 template <typename T>
 void MPointer<T>::operator=(MPointer<T>& other) {
     if (id != &other) {
-        globalClient->HandleDecreaseRefCountRequest(id);
+        if (id != 0) {
+            globalClient->HandleDecreaseRefCountRequest(id);
+        }
         id = other.id;
         globalClient->HandleIncreaseRefCountRequest(id);
     }
@@ -115,7 +118,9 @@ int MPointer<T>::operator&() {
 
 template <typename T>
 MPointer<T>::~MPointer() {
-    globalClient->HandleDecreaseRefCountRequest(id);
+    if (id != 0) {
+        globalClient->HandleDecreaseRefCountRequest(id);
+    }
 }
 
 #endif

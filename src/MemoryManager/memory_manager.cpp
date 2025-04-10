@@ -107,7 +107,7 @@ grpc::Status memory_manager::Set(grpc::ServerContext* context,
     response->set_success(true);
     cout << "[Set] Bloque " << id << " escrito. Bytes=" << valueBytes.size() << endl;
 
-    dumpFolderClass.dumpFolderUpdate(memoryBlocks);
+    // dumpFolderClass.dumpFolderUpdate(memoryBlocks);
 
     return grpc::Status::OK;
 
